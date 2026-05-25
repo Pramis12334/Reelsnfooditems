@@ -61,4 +61,9 @@ const user = await userModel.findOne({
     }
 }
 
-module.exports = { registerUser, loginUser };
+async function logoutUser(req, res) {
+    res.clearcookie;
+    return res.status(200).json({ message: "You have logged out successfully"});
+}
+
+module.exports = { registerUser, loginUser, logoutUser };
