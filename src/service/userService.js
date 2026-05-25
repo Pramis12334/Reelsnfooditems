@@ -15,4 +15,13 @@ async function hashingPassword(password) {
     return hashedPassword;
 }
 
-module.exports = {createuserToken, hashingPassword};
+async function createfoodpartnerToken(foodpartner) {
+    const token = jwt.sign({
+        id: foodpartner._id,
+        username: foodpartner.username,
+        email: foodpartner.email
+    }, process.env.JWT_SECRET_KEY);
+    return token;
+}
+
+module.exports = {createuserToken, hashingPassword, createfoodpartnerToken};

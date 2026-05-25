@@ -2,6 +2,7 @@ const userModel = require('../models/userModel');
 const userService = require('../service/userService');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const foodpartnerModel = require('../models/foodpartnerModel');
 
 async function registerUser(req, res) {
 const { username, email, password} = req.body;
@@ -31,7 +32,6 @@ try{
 } catch (error) {
     return res.status(400).json({ error: error.Message });
 }}
-
 async function loginUser(req, res) {
     
     try{
@@ -60,10 +60,80 @@ const user = await userModel.findOne({
         return res.status(400).json({ message: "Error occur while logging user"});
     }
 }
-
 async function logoutUser(req, res) {
-    res.clearcookie;
+    res.clearcookie("token");
     return res.status(200).json({ message: "You have logged out successfully"});
 }
 
-module.exports = { registerUser, loginUser, logoutUser };
+
+async function registerFoodpartner(req, res) {
+    const { username, email, password } = req.body
+
+    try{
+        if(!username || ! email || ! password) {
+            return res.status(401).json({message: "All fields are required"});
+        }
+
+        const isUseravailable = await foodpartnerModel.findOne({
+            $or: [
+                {username},
+                {email}
+            ]
+        });
+
+        if(isUseravailable) {
+            return res.status(400).json({message: "Foodpartner already existed"});
+        }
+
+        const hashedpassword = await userService.hashingPassword(password);
+
+        const foodpartner = new foodpartnerModel({
+            username,
+            email,
+            password: hashedpassword
+        });
+        await foodpartner.save();
+        const token = await userService.createfoodpartnerToken(foodpartner);
+        res.cookie("token", token);
+        res.status(201).json({ message: "Foodpartner successfully created"});
+
+    } catch(error) {
+        return res.status(400).json({ error: error.Message});
+    }
+}
+async function loginFoodpartner(req, res) {
+    try{
+        
+    const { username , email, password } = req.body;
+
+        const foodpartner = await foodpartnerModel.findOne({ 
+            $or: [
+                {username},
+                {email}
+            ]
+        });
+
+        if(!foodpartner) {
+            return res.status(401).json({ message: "Invalid credentials"});
+        }
+
+        const isMatch = await bcrypt.compare(password,foodpartner.password);
+        if(!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials"});
+        }
+
+        const token = await userService.createfoodpartnerToken(foodpartner);
+
+        res.cookie("token", token);
+
+        res.status(200).json({ message: "Foodpartner logged in successfully"});
+
+    } catch(error) {
+        return res.status(400).json({ error: error.Message});
+    }
+}
+async function logoutFoodpartner(req, res) {
+res.clearCookie("token");
+res.status(200).json({message: "Foodpartner logged out successfully"});
+}
+module.exports = { registerUser, loginUser, logoutUser, registerFoodpartner, loginFoodpartner, logoutFoodpartner };

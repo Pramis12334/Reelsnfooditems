@@ -25,7 +25,8 @@ const registerUserValidation = [
     .withMessage("Password must be at least 3 character long"),
     validateResult
 ];
-const loginUserValidation = [
+
+const registerFoodpartnerValidation = [
     body("username")
     .isString()
     .withMessage("Username must be a string")
@@ -35,8 +36,9 @@ const loginUserValidation = [
     .isEmail()
     .withMessage("Email must be valid"),
     body("password")
-    .isLength({min: 3})
-    .withMessage("Password must be at least 3 character long"),
+    .isLength({ min: 3})
+    .withMessage("Password must be greater than 3 character"),
     validateResult
-]
-module.exports = { registerUserValidation,loginUserValidation };
+];
+
+module.exports = { registerUserValidation, registerFoodpartnerValidation };
