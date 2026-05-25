@@ -14,4 +14,5 @@ async function hashingPassword(password) {
     const hashedPassword = bcrypt.hash(password, saltrounds);
     return hashedPassword;
 }
+
 module.exports = {createuserToken, hashingPassword};
