@@ -41,4 +41,14 @@ const registerFoodpartnerValidation = [
     validateResult
 ];
 
-module.exports = { registerUserValidation, registerFoodpartnerValidation };
+const createFoodValidation = [
+    body("name")
+    .isString()
+    .withMessage("Name must be a String"),
+    body("description")
+    .isLength({max:200})
+    .withMessage("Description cant be greater than 200 characters"),
+    ,validateResult
+]
+
+module.exports = { registerUserValidation, registerFoodpartnerValidation, createFoodValidation };
