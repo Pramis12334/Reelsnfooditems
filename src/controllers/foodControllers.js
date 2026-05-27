@@ -2,6 +2,7 @@ const fooditemsModel = require("../models/foodModel");
 const foodpartnerModel = require('../models/foodpartnerModel');
 const jwt = require('jsonwebtoken');
 const storageService = require('../service/storage.service');
+const { v4: uuid } = require('uuid');
 
 
 async function createFoodItems(req, res){
@@ -11,7 +12,7 @@ async function createFoodItems(req, res){
     const file = req.file;
     const foodpartner = req.foodpartner;
     
-    const result = await storageService.videoUpload(file.buffer.toString('base64'),file.originalname);
+    const result = await storageService.videoUpload(file.buffer.toString('base64'),uuid());
     const fooditems = await fooditemsModel.create({
         name,
         description,
@@ -25,5 +26,18 @@ async function createFoodItems(req, res){
     }
 };
 
+async function getFoodItems(req, res) {
+    try{
 
-module.exports = { createFoodItems };
+    const user = req.user;
+
+    const fooditems = await fooditemsModel.find({});
+
+    res.status(200).json({ message: "Fetch successfully", fooditems: fooditems});
+
+    } catch(err) {
+        return res.status(400).json({ err: err.array()});
+    }
+};
+
+module.exports = { createFoodItems, getFoodItems };

@@ -11,11 +11,9 @@ async function userMiddlewares(req, res, next) {
     }
 
     try{
-    const user = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const isuser = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-    if(!user) {
-        return res.status(400).json({ message: "Forbidden"});
-    }
+    const user = await userModel.findOne({_id: isuser.id});
 
     req.user = user;
 
@@ -24,8 +22,6 @@ async function userMiddlewares(req, res, next) {
     } catch(error) {
         return res.status(400).json({message: "Internal server error"})
     }
-    
-
 }
 async function foodPartnerMiddlewares(req, res, next) {
     const token = req.cookies.token;
@@ -39,11 +35,6 @@ async function foodPartnerMiddlewares(req, res, next) {
         const ispartner = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         const foodpartner = await foodpartnerModel.findOne({_id: ispartner.id});
-
-
-        if(!foodpartner) {
-            return res.status(400).json({ message: "Foodpartner doesnot exist"});
-        }
 
         req.foodpartner = foodpartner;
 
